@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cologne 2026 Sticker Tracker</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{--bg:#0d0d0f;--bg2:#141418;--bg3:#1c1c22;--bg4:#242429;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);--text:#f0f0f2;--text2:#9a9aaa;--text3:#5c5c6e;--gold:#d4a017;--gold2:#f5c842;--holo:#7c6cf0;--holo2:#a89cf7;--green:#3ecf8e;--red:#f06060;--accent:#7c6cf0;--radius:10px;--rsm:6px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;min-height:100vh;}
+.topbar{background:var(--bg2);border-bottom:.5px solid var(--border);padding:13px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{font-size:16px;font-weight:600;letter-spacing:-.3px;}
+.logo span{color:var(--gold2);}
+.ebadge{font-size:11px;font-weight:500;padding:3px 10px;background:rgba(212,160,23,.12);color:var(--gold2);border:.5px solid rgba(212,160,23,.3);border-radius:20px;margin-left:12px;}
+.tr{display:flex;align-items:center;gap:10px;}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--text3);transition:background .3s;}
+.sdot.on{background:var(--green);box-shadow:0 0 6px var(--green);}
+.sdot.warn{background:var(--gold);}
+#stxt{font-size:12px;color:var(--text2);}
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 50px);}
+.sidebar{background:var(--bg2);border-right:.5px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:18px;}
+.slbl{font-size:10px;font-weight:600;letter-spacing:.08em;color:var(--text3);text-transform:uppercase;margin-bottom:7px;}
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 14px;border-radius:var(--rsm);cursor:pointer;font-size:13px;font-weight:500;border:none;transition:opacity .15s,transform .1s;width:100%;}
+.btn:active{transform:scale(.97);}
+.bp{background:var(--accent);color:#fff;}
+.bp:hover{opacity:.88;}
+.bp:disabled{opacity:.4;cursor:not-allowed;}
+.bs{background:var(--bg3);color:var(--text2);border:.5px solid var(--border);}
+.bs:hover{background:var(--bg4);color:var(--text);}
+.btn i{font-size:15px;}
+.btn.spin i.ti-refresh{animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.cdbox{background:var(--bg3);border:.5px solid var(--border);border-radius:var(--rsm);padding:10px;text-align:center;}
+.cdlbl{font-size:10px;color:var(--text3);margin-bottom:3px;}
+.cdtime{font-size:20px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;}
+.cdtime.soon{color:var(--gold2);}
+.srow{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.sbox{background:var(--bg3);border-radius:var(--rsm);padding:10px;text-align:center;}
+.snum{font-size:18px;font-weight:600;}
+.snum.g{color:var(--green);}
+.snum.r{color:var(--red);}
+.slb{font-size:10px;color:var(--text3);margin-top:2px;}
+.pw{background:var(--bg3);border-radius:4px;height:3px;overflow:hidden;}
+.pb{height:100%;background:var(--accent);width:0%;transition:width .3s;}
+.ttog{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.tg{padding:8px;text-align:center;border-radius:var(--rsm);cursor:pointer;font-size:12px;font-weight:500;border:.5px solid var(--border);background:var(--bg3);color:var(--text2);transition:all .15s;}
+.tg.ah{background:rgba(124,108,240,.15);border-color:var(--holo);color:var(--holo2);}
+.tg.ag{background:rgba(212,160,23,.12);border-color:var(--gold);color:var(--gold2);}
+.main{padding:20px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:18px;}
+.sbar{background:var(--bg2);border:.5px solid var(--border);border-radius:var(--radius);padding:9px 14px;color:var(--text);font-size:13px;outline:none;width:100%;}
+.sbar::placeholder{color:var(--text3);}
+.sbar:focus{border-color:var(--border2);}
+.glbl{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.glblt{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;}
+.glbll{flex:1;height:.5px;background:var(--border);}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:8px;}
+.sc{background:var(--bg2);border:.5px solid var(--border);border-radius:var(--radius);padding:11px 12px;cursor:pointer;transition:border-color .15s,background .15s;position:relative;overflow:hidden;}
+.sc:hover{border-color:var(--border2);background:var(--bg3);}
+.sc.sh{border-color:var(--holo);background:rgba(124,108,240,.07);}
+.sc.sg{border-color:var(--gold);background:rgba(212,160,23,.06);}
+.pip{position:absolute;top:0;left:0;right:0;height:2px;}
+.pip.holo{background:linear-gradient(90deg,var(--holo),#c084fc);}
+.pip.gold{background:linear-gradient(90deg,var(--gold),var(--gold2));}
+.ct{font-size:10px;color:var(--text3);margin-bottom:2px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ctype{font-size:11px;font-weight:600;letter-spacing:.04em;margin-bottom:8px;}
+.ctype.holo{color:var(--holo2);}
+.ctype.gold{color:var(--gold2);}
+.cp{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;}
+.cp.e{color:var(--text3);font-size:13px;font-weight:400;}
+.cc{font-size:11px;margin-top:3px;}
+.cc.up{color:var(--green);}
+.cc.dn{color:var(--red);}
+.csrc{font-size:9px;color:var(--text3);margin-top:5px;}
+.chcard{background:var(--bg2);border:.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;}
+.chtop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.chn{font-size:15px;font-weight:600;}
+.chs{font-size:11px;color:var(--text3);margin-top:2px;}
+.pills{display:flex;gap:6px;flex-wrap:wrap;}
+.pill{font-size:10px;padding:3px 9px;border-radius:20px;border:.5px solid var(--border);color:var(--text2);background:var(--bg3);}
+.logcard{background:var(--bg2);border:.5px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.loghdr{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:.5px solid var(--border);}
+.loghdr span{font-size:12px;font-weight:500;color:var(--text2);}
+.logbody{font-family:'Consolas','Courier New',monospace;font-size:11px;color:var(--text2);padding:10px 14px;max-height:130px;overflow-y:auto;line-height:1.7;}
+.lok{color:var(--green);}
+.lerr{color:var(--red);}
+.linf{color:var(--text3);}
+.banner{background:rgba(124,108,240,.1);border:.5px solid rgba(124,108,240,.25);border-radius:var(--rsm);padding:10px 14px;font-size:12px;color:var(--holo2);line-height:1.6;}
+@media(max-width:720px){.layout{grid-template-columns:1fr;}.sidebar{border-right:none;border-bottom:.5px solid var(--border);}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div style="display:flex;align-items:center;">
+    <div class="logo">CS2 <span>Cologne 2026</span> Sticker Tracker</div>
+    <div class="ebadge">PGL Major</div>
+  </div>
+  <div class="tr">
+    <div class="sdot" id="sdot"></div>
+    <span id="stxt">idle</span>
+  </div>
+</div>
+<div class="layout">
+  <div class="sidebar">
+    <div>
+      <div class="slbl">Data source</div>
+      <div style="background:var(--bg3);border:.5px solid var(--border);border-radius:var(--rsm);padding:10px 12px;">
+        <div style="font-size:13px;font-weight:500;margin-bottom:3px;">Skinport Public API</div>
+        <div style="font-size:11px;color:var(--text3);">Free · No key needed · No login</div>
+      </div>
+    </div>
+    <div>
+      <div class="slbl">Type filter</div>
+      <div class="ttog">
+        <div class="tg ah" id="togH" onclick="toggleType('holo')"><i class="ti ti-diamond"></i> Holo</div>
+        <div class="tg ag" id="togG" onclick="toggleType('gold')"><i class="ti ti-star"></i> Gold</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div class="slbl">Actions</div>
+      <button class="btn bp" id="fetchBtn" onclick="fetchAll()">
+        <i class="ti ti-refresh"></i> Fetch prices now
+      </button>
+      <button class="btn bs" onclick="exportCSV()">
+        <i class="ti ti-download"></i> Export CSV
+      </button>
+    </div>
+    <div>
+      <div class="slbl">Next auto-fetch</div>
+      <div class="cdbox">
+        <div class="cdlbl">every 4 hours</div>
+        <div class="cdtime" id="cdtime">—</div>
+      </div>
+    </div>
+    <div>
+      <div class="slbl">Session</div>
+      <div class="srow">
+        <div class="sbox"><div class="snum g" id="statOk">0</div><div class="slb">Found</div></div>
+        <div class="sbox"><div class="snum r" id="statFail">0</div><div class="slb">Not listed</div></div>
+      </div>
+      <div style="margin-top:10px;">
+        <div class="slbl" style="margin-bottom:5px;">Progress</div>
+        <div class="pw"><div class="pb" id="pbar"></div></div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px;" id="ptxt"></div>
+      </div>
+    </div>
+    <div>
+      <div class="slbl">Last fetch</div>
+      <div style="font-size:11px;color:var(--text3);" id="lastFetch">Never</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="banner">
+      <strong>100% free</strong> — uses Skinport's public API, no account or key needed.<br>
+      Stickers will show prices once Cologne 2026 goes live. History saves in your browser.
+    </div>
+    <input class="sbar" type="text" id="searchInput" placeholder="Search team…" oninput="renderGrids()">
+    <div id="secH">
+      <div class="glbl">
+        <span class="glblt" style="color:var(--holo2);">Holo stickers</span>
+        <div class="glbll"></div>
+        <span style="font-size:10px;color:var(--text3);" id="cntH"></span>
+      </div>
+      <div class="grid" id="gridH"></div>
+    </div>
+    <div id="secG">
+      <div class="glbl">
+        <span class="glblt" style="color:var(--gold2);">Gold stickers</span>
+        <div class="glbll"></div>
+        <span style="font-size:10px;color:var(--text3);" id="cntG"></span>
+      </div>
+      <div class="grid" id="gridG"></div>
+    </div>
+    <div class="chcard">
+      <div class="chtop">
+        <div>
+          <div class="chn" id="chartName">Click any sticker to chart its history</div>
+          <div class="chs" id="chartSub">4-hour intervals</div>
+        </div>
+        <div class="pills" id="chartPills"></div>
+      </div>
+      <div style="position:relative;width:100%;height:210px;">
+        <canvas id="priceChart" role="img" aria-label="Sticker price history"></canvas>
+      </div>
+    </div>
+    <div class="logcard">
+      <div class="loghdr">
+        <span><i class="ti ti-terminal-2" style="font-size:13px;vertical-align:-1px;margin-right:5px;"></i>Log</span>
+        <button class="btn bs" style="font-size:11px;padding:4px 10px;width:auto;" onclick="logs=[];renderLog();">Clear</button>
+      </div>
+      <div class="logbody" id="logBody">Ready — click Fetch prices now to start.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const TEAMS=["Natus Vincere","Virtus.pro","FaZe Clan","Team Spirit","G2 Esports","MOUZ","Cloud9","Heroic","FURIA","Team Liquid","Astralis","BIG","Vitality","Complexity","paiN Gaming"];
+const EVENT="Cologne 2026";
+const SKINPORT_URL="https://api.skinport.com/v1/prices?app_id=730&currency=USD";
+const PROXIES=[
+  url=>`https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+  url=>`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  url=>`https://thingproxy.freeboard.io/fetch/${url}`
+];
+const data={};
+TEAMS.forEach(t=>["holo","gold"].forEach(type=>{
+  const k=t+"_"+type;
+  const label=type==="holo"?"Holo":"Gold";
+  data[k]={team:t,type,key:k,price:null,prev:null,history:[],hash:`Sticker | ${t} (${label}) | ${EVENT}`};
+}));
+let show={holo:true,gold:true},selKey=null,chart=null,logs=[],sOk=0,sFail=0,nextAt=null,cdT=null;
+
+function save(){try{const s={};Object.keys(data).forEach(k=>{s[k]={price:data[k].price,prev:data[k].prev,history:data[k].history};});localStorage.setItem("c26",JSON.stringify(s));}catch(e){}}
+function load(){try{const r=localStorage.getItem("c26");if(!r)return;const s=JSON.parse(r);Object.keys(s).forEach(k=>{if(data[k])Object.assign(data[k],s[k]);});log("Loaded saved history.","inf");}catch(e){}}
+function log(m,t="inf"){const ts=new Date().toLocaleTimeString();logs.unshift({ts,m,t});if(logs.length>120)logs.pop();renderLog();}
+function renderLog(){document.getElementById("logBody").innerHTML=logs.map(l=>`<div class="l${l.t}">[${l.ts}] ${l.m}</div>`).join("")||`<span class="linf">empty</span>`;}
+function setStatus(t,s){document.getElementById("stxt").textContent=t;document.getElementById("sdot").className="sdot"+(s==="on"?" on":s==="warn"?" warn":"");}
+function toggleType(type){show[type]=!show[type];const e=document.getElementById(type==="holo"?"togH":"togG");e.className="tg"+(show[type]?(type==="holo"?" ah":" ag"):"");renderGrids();}
+
+function renderGrids(){
+  const q=document.getElementById("searchInput").value.toLowerCase();
+  ["holo","gold"].forEach(type=>{
+    const sec=document.getElementById(type==="holo"?"secH":"secG");
+    sec.style.display=show[type]?"":"none";
+    const grid=document.getElementById(type==="holo"?"gridH":"gridG");
+    const teams=TEAMS.filter(t=>t.toLowerCase().includes(q));
+    const priced=teams.filter(t=>data[t+"_"+type].price!=null).length;
+    document.getElementById(type==="holo"?"cntH":"cntG").textContent=priced+"/"+teams.length+" priced";
+    grid.innerHTML=teams.map(team=>{
+      const k=team+"_"+type,s=data[k],sel=selKey===k;
+      let ph=s.price!=null?`<div class="cp">$${parseFloat(s.price).toFixed(2)}</div>`:`<div class="cp e">not listed yet</div>`;
+      let ch="";
+      if(s.prev!=null&&s.price!=null){const d=parseFloat(s.price)-parseFloat(s.prev),pct=((d/parseFloat(s.prev))*100).toFixed(1),cls=d>0?"up":d<0?"dn":"",sym=d>0?"▲":d<0?"▼":"●";ch=`<div class="cc ${cls}">${sym} $${Math.abs(d).toFixed(2)} (${pct}%)</div>`;}
+      return `<div class="sc ${sel?(type==="holo"?"sh":"sg"):""}" onclick="selCard('${k}')">
+        <div class="pip ${type}"></div>
+        <div class="ct">${team}</div>
+        <div class="ctype ${type}">${type.toUpperCase()}</div>
+        ${ph}${ch}
+        ${s.history.length?`<div class="csrc">${s.history.length} pts · Skinport</div>`:""}
+      </div>`;
+    }).join("");
+  });
+}
+
+function selCard(key){
+  selKey=key;renderGrids();
+  const s=data[key];
+  document.getElementById("chartName").textContent=`${s.team} | ${s.type.toUpperCase()}`;
+  document.getElementById("chartSub").textContent=`${s.history.length} point(s) · 4h intervals`;
+  document.getElementById("chartPills").innerHTML=s.price!=null
+    ?`<span class="pill">$${parseFloat(s.price).toFixed(2)}</span><span class="pill">${s.history.length} pts</span><span class="pill">Skinport</span>`
+    :`<span class="pill">no data yet</span>`;
+  buildChart(s);
+}
+
+function buildChart(s){
+  if(chart){chart.destroy();chart=null;}
+  if(!s.history.length)return;
+  const lc=s.type==="holo"?"#7c6cf0":"#d4a017",fc=s.type==="holo"?"rgba(124,108,240,.12)":"rgba(212,160,23,.10)";
+  chart=new Chart(document.getElementById("priceChart"),{
+    type:"line",
+    data:{labels:s.history.map(h=>h.l),datasets:[{label:"USD",data:s.history.map(h=>parseFloat(h.p)),borderColor:lc,backgroundColor:fc,fill:true,tension:0.4,pointRadius:s.history.length<=12?4:2,pointHoverRadius:6,borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>" $"+c.parsed.y.toFixed(2)}}},
+      scales:{x:{ticks:{color:"#5c5c6e",font:{size:10},maxRotation:40,autoSkip:true},grid:{color:"rgba(255,255,255,.04)"}},y:{ticks:{color:"#5c5c6e",font:{size:10},callback:v=>"$"+v.toFixed(2)},grid:{color:"rgba(255,255,255,.04)"}}}}
+  });
+}
+
+async function fetchAll(){
+  const btn=document.getElementById("fetchBtn");
+  btn.disabled=true;btn.classList.add("spin");
+  setStatus("fetching…","warn");
+  log("─── Fetching from Skinport API ───","inf");
+  document.getElementById("pbar").style.width="0%";
+  document.getElementById("ptxt").textContent="Calling Skinport…";
+
+  let spData=null;
+  for(let i=0;i<PROXIES.length;i++){
+    const proxyUrl=PROXIES[i](SKINPORT_URL);
+    const proxyName=["corsproxy.io","allorigins.win","thingproxy"][i];
+    try{
+      log(`Trying ${proxyName}…`,"inf");
+      const res=await fetch(proxyUrl);
+      if(!res.ok)throw new Error("HTTP "+res.status);
+      const raw=await res.text();
+      spData=JSON.parse(raw);
+      if(!Array.isArray(spData))throw new Error("unexpected response format");
+      log(`✓ Got ${spData.length} items via ${proxyName}`,"ok");
+      break;
+    }catch(e){
+      log(`✗ ${proxyName} failed: ${e.message}`,"err");
+      if(i===PROXIES.length-1){
+        log("All proxies failed. Try again in a minute — free proxies have rate limits.","err");
+        btn.disabled=false;btn.classList.remove("spin");
+        setStatus("failed","");
+        document.getElementById("ptxt").textContent="All proxies failed — retry in 1 min";
+        return;
+      }
+    }
+  }
+
+  const lkp={};
+  spData.forEach(item=>{ lkp[item.market_hash_name]=item; });
+
+  const keys=[];
+  TEAMS.forEach(t=>{keys.push(t+"_holo");keys.push(t+"_gold");});
+  let ok=0,fail=0;
+  const label=new Date().toLocaleString([],{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+
+  keys.forEach((k,i)=>{
+    const s=data[k],item=lkp[s.hash];
+    document.getElementById("pbar").style.width=((i+1)/keys.length*100).toFixed(0)+"%";
+    document.getElementById("ptxt").textContent=`${i+1}/${keys.length} — ${s.team} ${s.type}`;
+    if(item){
+      const raw=item.min_price??item.suggested_price??item.mean_price;
+      const price=parseFloat(raw);
+      if(!isNaN(price)&&price>0){
+        s.prev=s.price;s.price=price;
+        s.history.push({l:label,p:price});
+        if(s.history.length>48)s.history.shift();
+        ok++;sOk++;
+        log(`✓ ${s.team} | ${s.type.toUpperCase()}: $${price.toFixed(2)}`,"ok");
+      }else{fail++;sFail++;log(`— ${s.team} | ${s.type.toUpperCase()}: listed, no price yet`,"inf");}
+    }else{fail++;sFail++;log(`— ${s.team} | ${s.type.toUpperCase()}: not on Skinport yet`,"inf");}
+  });
+
+  document.getElementById("statOk").textContent=sOk;
+  document.getElementById("statFail").textContent=sFail;
+  document.getElementById("pbar").style.width="100%";
+  document.getElementById("ptxt").textContent=`Done — ${ok} priced, ${fail} not listed`;
+  document.getElementById("lastFetch").textContent=new Date().toLocaleString();
+  log(`─── Done: ${ok} prices, ${fail} not listed ───`,ok>0?"ok":"inf");
+  save();renderGrids();
+  if(selKey)selCard(selKey);
+  btn.disabled=false;btn.classList.remove("spin");
+  setStatus(ok>0?`${ok} prices live`:"not listed yet",ok>0?"on":"");
+  schedNext();
+}
+
+function schedNext(){
+  if(cdT)clearInterval(cdT);
+  nextAt=Date.now()+4*60*60*1000;
+  cdT=setInterval(()=>{
+    const rem=nextAt-Date.now();
+    const el=document.getElementById("cdtime");
+    if(rem<=0){clearInterval(cdT);el.textContent="now";fetchAll();return;}
+    const h=Math.floor(rem/3600000),m=Math.floor((rem%3600000)/60000),s=Math.floor((rem%60000)/1000);
+    el.textContent=`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    el.className="cdtime"+(rem<300000?" soon":"");
+  },1000);
+}
+
+function exportCSV(){
+  const rows=[["Team","Type","Market Hash Name","Latest Price (USD)","Previous (USD)","Data Points","Last Updated"]];
+  TEAMS.forEach(t=>["holo","gold"].forEach(type=>{
+    const s=data[t+"_"+type],last=s.history.length?s.history[s.history.length-1].l:"";
+    rows.push([t,type,s.hash,s.price??"",s.prev??"",s.history.length,last]);
+  }));
+  const csv=rows.map(r=>r.map(c=>`"${c}"`).join(",")).join("\n");
+  const a=document.createElement("a");
+  a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);
+  a.download=`cologne2026_${new Date().toISOString().slice(0,16).replace("T","_")}.csv`;
+  a.click();log("CSV exported.","ok");
+}
+
+load();renderGrids();
+</script>
+</body>
+</html>
